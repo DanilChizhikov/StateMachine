@@ -1,7 +1,7 @@
 {
     "name": "com.danilchizhikov.statemachine",
     "displayName": "State Machine",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "unity": "2022.3",
     "dependencies": {},
     "description": "State Machine for Unity.",

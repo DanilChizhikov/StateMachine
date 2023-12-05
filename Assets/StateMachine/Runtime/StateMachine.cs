@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace MbsCore.StateMachine.Runtime
 {
-    public sealed class StateMachine : IStateMachine, IDisposable
+    public class StateMachine : IStateMachine, IDisposable
     {
         public event Action<IState, IState> OnStateChanged;
 
