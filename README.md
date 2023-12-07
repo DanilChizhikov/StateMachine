@@ -25,7 +25,7 @@ Prerequisites:
 1. Navigate to your project's Packages folder and open the manifest.json file.
 2. Add this line below the "dependencies": { line
     - ```json title="Packages/manifest.json"
-      "com.danilchizhikov.statemachine": "https://github.com/DanilChizhikov/statemachine.git?path=Assets/statemachine#0.0.2",
+      "com.danilchizhikov.statemachine": "https://github.com/DanilChizhikov/statemachine.git?path=Assets/StateMachine#0.0.2",
       ```
 UPM should now install the package.
 
