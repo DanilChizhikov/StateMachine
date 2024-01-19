@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using MbsCore.StateMachine.Infrastructure;
 using UnityEngine;
 
-namespace MbsCore.StateMachine.Tests
+namespace MbsCore.StateMachine.Example
 {
-    internal sealed class ExampleTestState2 : IExitableState, ISetupableState<string>
+    public sealed class SetupableExampleState : IExampleState, IExitableState, ISetupableState<string>
     {
         public string Value { get; private set; }
 
-        public ExampleTestState2()
+        public SetupableExampleState()
         {
             Value = string.Empty;
         }

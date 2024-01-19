@@ -1,0 +1,17 @@
+{
+  "name": "StateMachine.Example",
+  "rootNamespace": "MbsCore",
+  "references": [
+    "GUID:df9fcc7995f6441e181d058114299f42",
+    "GUID:5b23d91cfe8af42da80946aa1bfb6335"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

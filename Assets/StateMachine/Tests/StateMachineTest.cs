@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using MbsCore.StateMachine.Example;
 using MbsCore.StateMachine.Infrastructure;
 using NUnit.Framework;
 using UnityEngine;
@@ -15,21 +16,18 @@ namespace MbsCore.StateMachine.Tests
         private const int SecondsForEnterToState = 5;
         private const string StateValue = "Example";
 
-        private readonly HashSet<IState> _states = new();
+        private IExampleStateMachine _stateMachine;
         
         [SetUp]
         public void Setup()
         {
-            _states.Clear();
-            _states.Add(new ExampleTestState1());
-            _states.Add(new ExampleTestState2());
+            _stateMachine = new ExampleStateMachine(new SimpleExampleState(), new SetupableExampleState());
         }
 
         [UnityTest]
         public IEnumerator SimpleEnterToState()
         {
-            IStateMachine machine = new Runtime.StateMachine(_states);
-            TaskAwaiter awaiter = machine.EnterAsync<ExampleTestState1>().GetAwaiter();
+            TaskAwaiter awaiter = _stateMachine.EnterAsync<SimpleExampleState>().GetAwaiter();
             DateTime beginTime = DateTime.UtcNow;
             TimeSpan timeout = beginTime.AddSeconds(SecondsForEnterToState) - beginTime;
             
@@ -41,7 +39,7 @@ namespace MbsCore.StateMachine.Tests
             }
             else
             {
-                bool isDesiredState = typeof(ExampleTestState1) == machine.CurrentState.GetType();
+                bool isDesiredState = typeof(SimpleExampleState).Equals(_stateMachine.CurrentState.GetType());
                 Assert.AreEqual(isDesiredState, true);
             }
         }
@@ -49,8 +47,7 @@ namespace MbsCore.StateMachine.Tests
         [UnityTest]
         public IEnumerator EnterToStateWithValue()
         {
-            IStateMachine machine = new Runtime.StateMachine(_states);
-            TaskAwaiter awaiter = machine.EnterAsync<ExampleTestState2, string>(StateValue).GetAwaiter();
+            TaskAwaiter awaiter = _stateMachine.EnterAsync<SetupableExampleState, string>(StateValue).GetAwaiter();
             DateTime beginTime = DateTime.UtcNow;
             TimeSpan timeout = beginTime.AddSeconds(SecondsForEnterToState) - beginTime;
             
@@ -62,12 +59,10 @@ namespace MbsCore.StateMachine.Tests
             }
             else
             {
-                bool isDesiredState = typeof(ExampleTestState2) == machine.CurrentState.GetType();
-                bool isDesiredValue = isDesiredState &&
-                                      machine.CurrentState is ExampleTestState2 state &&
+                bool isDesiredValue = _stateMachine.CurrentState is SetupableExampleState state &&
                                       state.Value.Equals(StateValue);
                 
-                Assert.AreEqual(isDesiredState && isDesiredValue, true);
+                Assert.AreEqual(isDesiredValue, true);
             }
         }
 

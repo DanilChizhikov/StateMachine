@@ -9,6 +9,7 @@ This package shows a possible state machine implementation for Unity and C# proj
     - [Install manually (using .unitypackage)](#Install-manually-(using-.unitypackage))
     - [Install via UPM (using Git URL)](#Install-via-UPM-(using-Git-URL))
 - [Basic Usage](#Basic-Usage)
+    - [Example](#Example)
     - [Runtime Code](#Runtime-Code)
 - [License](#License)
 
@@ -25,23 +26,42 @@ Prerequisites:
 1. Navigate to your project's Packages folder and open the manifest.json file.
 2. Add this line below the "dependencies": { line
     - ```json title="Packages/manifest.json"
-      "com.danilchizhikov.statemachine": "https://github.com/DanilChizhikov/statemachine.git?path=Assets/StateMachine#0.0.2",
+      "com.danilchizhikov.statemachine": "https://github.com/DanilChizhikov/statemachine.git?path=Assets/StateMachine#0.1.0",
       ```
 UPM should now install the package.
+
+## Example
+
+- Custom example state
+```csharp
+public interface IExampleState : IState { }
+```
+
+- Custom example state machine
+```csharp
+public interface IExampleStateMachine : IStateMachine<IExampleState> { }
+
+public sealed class ExampleStateMachine : StateMachine<IExampleState>, IExampleStateMachine
+{
+    public ExampleStateMachine(IEnumerable<IExampleState> states) : base(states) { }
+
+    public ExampleStateMachine(params IExampleState[] states) : base(states) { }
+}
+```
 
 ## Basic Usage
 
 ### Runtime Code
-First, you need to initialize the StateMachine, this can be done using different methods.
+First, you need to initialize the StateMachine<TState>, this can be done using different methods.
 Here we will show the easiest way, which is not the method that we recommend using!
 ```csharp
 public class StateMachineBootstrap : MonoBehaviour
 {
-    private static IStateMachine _stateMachine;
+    private static IExampleStateMachine _stateMachine;
 
     private bool _isInit = false;
 
-    public static IStateMachine StateMachine => _stateMachine;
+    public static IExampleStateMachine StateMachine => _stateMachine;
 
     private async void Awake()
     {
@@ -51,8 +71,8 @@ public class StateMachineBootstrap : MonoBehaviour
             return;
         }
 
-        IState state = new ExampleState();
-        _stateMachine = new StateMachine(state);
+        IExampleState state = new ExampleState();
+        _stateMachine = new ExampleStateMachine(state);
         await _stateMachine.EnterAsync<ExampleState>();
         _isInit = true;
     }
@@ -69,7 +89,7 @@ public class StateMachineBootstrap : MonoBehaviour
 ```
 
 ```csharp
-public class ExampleState : IExitableState
+public class ExampleState : IExampleState, IExitableState
 {
     public async Task EnterAsync(CancellationToken token)
     {
@@ -87,9 +107,9 @@ You can listen to the state change, this can be done as follows
 ```csharp
 public class Example : IDisposable
 {
-    private readonly IStateMachine _stateMachine;
+    private readonly IExampleStateMachine _stateMachine;
     
-    public Example(IStateMachine stateMachine)
+    public Example(IExampleStateMachine stateMachine)
     {
         _stateMachine = stateMachine;
     }
@@ -104,7 +124,7 @@ public class Example : IDisposable
         _stateMachine.OnStateChanged -= StateChangedCallback;
     }
 
-    private void StateChangedCallback(IState previous, IState current)
+    private void StateChangedCallback(IExampleState previous, IExampleState current)
     {
         // some code
     }
@@ -122,9 +142,9 @@ namespace MbsCore.StateMachine.Infrastructure
 }
 ```
 
-After that, you can call a method from IStateMachine that accepts a generic argument
+After that, you can call a method from IStateMachine<TState> that accepts a generic argument
 ```csharp
-Task EnterAsync<TState, T>(T value) where TState : IState;
+Task EnterAsync<TEnterState, T>(T value) where TEnterState : TState;
 ```
 
 ## License

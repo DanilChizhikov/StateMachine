@@ -7,40 +7,40 @@ using UnityEngine;
 
 namespace MbsCore.StateMachine.Runtime
 {
-    public class StateMachine : IStateMachine, IDisposable
+    public abstract class StateMachine<TState> : IStateMachine<TState>, IDisposable where TState : IState
     {
-        public event Action<IState, IState> OnStateChanged;
+        public event Action<TState, TState> OnStateChanged;
 
-        private readonly Dictionary<string, IState> _stateMap;
+        private readonly Dictionary<int, TState> _stateMap;
 
-        public IState CurrentState { get; private set; }
+        public TState CurrentState { get; private set; }
 
-        public StateMachine(IEnumerable<IState> states)
+        public StateMachine(IEnumerable<TState> states)
         {
-            _stateMap = new StateMapBuilder().SetStates(states).Build();
-            CurrentState = null;
+            _stateMap = new StateMapBuilder<TState>().SetStates(states).Build();
+            CurrentState = default;
         }
 
-        public StateMachine(params IState[] states)
+        public StateMachine(params TState[] states)
         {
-            var builder = new StateMapBuilder();
+            var builder = new StateMapBuilder<TState>();
             for (int i = states.Length - 1; i >= 0; i--)
             {
                 builder.SetState(states[i]);
             }
 
             _stateMap = builder.Build();
-            CurrentState = null;
+            CurrentState = default;
         }
 
-        public async Task EnterAsync<TState>() where TState : IState
+        public async Task EnterAsync<TEnterState>() where TEnterState : TState
         {
-            await Enter<TState, object>(null);
+            await Enter<TEnterState, object>(null);
         }
 
-        public async Task EnterAsync<TState, T>(T value) where TState : IState
+        public async Task EnterAsync<TEnterState, T>(T value) where TEnterState : TState
         {
-            await Enter<TState, T>(value);
+            await Enter<TEnterState, T>(value);
         }
 
         public void Dispose()
@@ -48,9 +48,9 @@ namespace MbsCore.StateMachine.Runtime
             Task.Factory.StartNew(TryExitCachedState);
         }
         
-        private bool TryGetState(Type stateType, out IState state)
+        private bool TryGetState(Type stateType, out TState state)
         {
-            if (_stateMap.TryGetValue(stateType.FullName, out state))
+            if (_stateMap.TryGetValue(stateType.FullName.GetHashCode(), out state))
             {
                 return true;
             }
@@ -90,11 +90,11 @@ namespace MbsCore.StateMachine.Runtime
             setupable.Setup(value);
         }
 
-        private async Task Enter<TState, TValue>(TValue value) where TState : IState
+        private async Task Enter<TEnterState, TValue>(TValue value) where TEnterState : TState
         {
-            IState lastState = CurrentState;
+            TState lastState = CurrentState;
             await TryExitCachedState();
-            if (!TryGetState(typeof(TState), out IState state))
+            if (!TryGetState(typeof(TEnterState), out TState state))
             {
                 return;
             }

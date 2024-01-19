@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using MbsCore.StateMachine.Infrastructure;
 using UnityEngine;
 
-namespace MbsCore.StateMachine.Tests
+namespace MbsCore.StateMachine.Example
 {
-    internal sealed class ExampleTestState1 : IExitableState
+    public sealed class SimpleExampleState : IExampleState, IExitableState
     {
         public async Task EnterAsync(CancellationToken token)
         {

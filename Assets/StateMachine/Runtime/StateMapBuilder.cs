@@ -3,22 +3,22 @@ using MbsCore.StateMachine.Infrastructure;
 
 namespace MbsCore.StateMachine.Runtime
 {
-    internal sealed class StateMapBuilder
+    internal sealed class StateMapBuilder<TState> where TState : IState
     {
-        private readonly HashSet<IState> _states;
+        private readonly HashSet<TState> _states;
 
         public StateMapBuilder()
         {
-            _states = new HashSet<IState>();
+            _states = new HashSet<TState>();
         }
 
-        public StateMapBuilder SetState(IState state)
+        public StateMapBuilder<TState> SetState(TState state)
         {
             _states.Add(state);
             return this;
         }
 
-        public StateMapBuilder SetStates(IEnumerable<IState> states)
+        public StateMapBuilder<TState> SetStates(IEnumerable<TState> states)
         {
             foreach (var state in states)
             {
@@ -28,12 +28,12 @@ namespace MbsCore.StateMachine.Runtime
             return this;
         }
 
-        public Dictionary<string, IState> Build()
+        public Dictionary<int, TState> Build()
         {
-            var map = new Dictionary<string, IState>();
+            var map = new Dictionary<int, TState>();
             foreach (var state in _states)
             {
-                map.Add(state.GetType().FullName, state);
+                map.Add(state.GetType().FullName.GetHashCode(), state);
             }
 
             return map;

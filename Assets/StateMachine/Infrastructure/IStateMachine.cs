@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 namespace MbsCore.StateMachine.Infrastructure
 {
-    public interface IStateMachine
+    public interface IStateMachine<TState> where TState : IState
     {
-        event Action<IState, IState> OnStateChanged;
+        event Action<TState, TState> OnStateChanged;
         
-        IState CurrentState { get; }
+        TState CurrentState { get; }
         
-        Task EnterAsync<TState>() where TState : IState;
-        Task EnterAsync<TState, T>(T value) where TState : IState;
+        Task EnterAsync<TEnterState>() where TEnterState : TState;
+        Task EnterAsync<TEnterState, T>(T value) where TEnterState : TState;
     }
 }
