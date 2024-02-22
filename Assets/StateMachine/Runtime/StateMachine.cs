@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using MbsCore.Extensions.Runtime;
 using MbsCore.StateMachine.Infrastructure;
 using UnityEngine;
 
@@ -11,25 +12,22 @@ namespace MbsCore.StateMachine.Runtime
     {
         public event Action<TState, TState> OnStateChanged;
 
-        private readonly Dictionary<int, TState> _stateMap;
+        private readonly List<TState> _states;
+        private readonly Dictionary<Type, TState> _stateMap;
 
         public TState CurrentState { get; private set; }
 
         public StateMachine(IEnumerable<TState> states)
         {
-            _stateMap = new StateMapBuilder<TState>().SetStates(states).Build();
+            _states = new List<TState>(states);
+            _stateMap = new Dictionary<Type, TState>(_states.Count);
             CurrentState = default;
         }
 
         public StateMachine(params TState[] states)
         {
-            var builder = new StateMapBuilder<TState>();
-            for (int i = states.Length - 1; i >= 0; i--)
-            {
-                builder.SetState(states[i]);
-            }
-
-            _stateMap = builder.Build();
+            _states = new List<TState>(states);
+            _stateMap = new Dictionary<Type, TState>(_states.Count);
             CurrentState = default;
         }
 
@@ -50,12 +48,37 @@ namespace MbsCore.StateMachine.Runtime
         
         private bool TryGetState(Type stateType, out TState state)
         {
-            if (_stateMap.TryGetValue(stateType.FullName.GetHashCode(), out state))
+            if (_stateMap.TryGetValue(stateType, out state))
             {
                 return true;
             }
+
+            int smallestWeight = int.MaxValue;
+            bool found = false;
+            for (int i = _states.Count - 1; i >= 0; i--)
+            {
+                TState cachedState = _states[i];
+                if (!cachedState.GetType().IsAssignableFrom(stateType))
+                {
+                    continue;
+                }
+
+                int weight = cachedState.GetType().Comparison(stateType);
+                if (weight <= smallestWeight)
+                {
+                    smallestWeight = weight;
+                    state = cachedState;
+                    found = true;
+                }
+            }
+
+            if (!found)
+            {
+                Debug.LogError($"Could not found state [{stateType.FullName}]");
+                return false;
+            }
             
-            Debug.LogError($"Could not found state [{stateType.FullName}]");
+            _stateMap.Add(stateType, state);
             return false;
         }
 

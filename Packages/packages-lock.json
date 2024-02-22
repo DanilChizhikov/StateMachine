@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.danilchizhikov.extensions": {
+      "version": "https://github.com/DanilChizhikov/Extensions.git?path=Assets/Extensions#0.0.7",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "3de626e0d905ec9361c891cd21114b4d0aaae838"
+    },
     "com.unity.2d.animation": {
       "version": "9.0.4",
       "depth": 1,

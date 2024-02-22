@@ -2,7 +2,8 @@
     "name": "StateMachine.Runtime",
     "rootNamespace": "MbsCore",
     "references": [
-        "GUID:df9fcc7995f6441e181d058114299f42"
+        "GUID:df9fcc7995f6441e181d058114299f42",
+        "GUID:bf0956da11227458b825a065927c25ef"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

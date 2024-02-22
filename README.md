@@ -17,6 +17,7 @@ This package shows a possible state machine implementation for Unity and C# proj
 Prerequisites:
 - [GIT](https://git-scm.com/downloads)
 - [Unity](https://unity.com/releases/editor/archive) 2022.3+
+- [Extensions](https://github.com/DanilChizhikov/Extensions.git) 0.0.7+
 
 ### Install manually (using .unitypackage)
 1. Download the .unitypackage from [releases](https://github.com/DanilChizhikov/StateMachine/releases/) page.
@@ -26,7 +27,7 @@ Prerequisites:
 1. Navigate to your project's Packages folder and open the manifest.json file.
 2. Add this line below the "dependencies": { line
     - ```json title="Packages/manifest.json"
-      "com.danilchizhikov.statemachine": "https://github.com/DanilChizhikov/statemachine.git?path=Assets/StateMachine#0.1.0",
+      "com.danilchizhikov.statemachine": "https://github.com/DanilChizhikov/statemachine.git?path=Assets/StateMachine",
       ```
 UPM should now install the package.
 

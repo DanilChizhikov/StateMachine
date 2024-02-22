@@ -1,9 +1,11 @@
 {
     "name": "com.danilchizhikov.statemachine",
     "displayName": "State Machine",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "unity": "2022.3",
-    "dependencies": {},
+    "dependencies": {
+        "com.danilchizhikov.extensions": "https://github.com/DanilChizhikov/Extensions.git?path=Assets/Extensions#0.0.7"
+    },
     "description": "State Machine for Unity.",
     "keywords": [
         "StateMachine",
