@@ -40,13 +40,11 @@ public interface IExampleState : IState { }
 
 - Custom example state machine
 ```csharp
-public interface IExampleStateMachine : IStateMachine<IExampleState> { }
+public interface IExampleStateMachine : IStateMachine<ExampleState> { }
 
-public sealed class ExampleStateMachine : StateMachine<IExampleState>, IExampleStateMachine
+public sealed class ExampleStateMachine : StateMachine<ExampleState>, IExampleStateMachine
 {
-    public ExampleStateMachine(IEnumerable<IExampleState> states) : base(states) { }
-
-    public ExampleStateMachine(params IExampleState[] states) : base(states) { }
+    public ExampleStateMachine(IEnumerable<ExampleState> states) : base(states) { }
 }
 ```
 
@@ -72,9 +70,9 @@ public class StateMachineBootstrap : MonoBehaviour
             return;
         }
 
-        IExampleState state = new ExampleState();
-        _stateMachine = new ExampleStateMachine(state);
-        await _stateMachine.EnterAsync<ExampleState>();
+        ISomeState state = new SomeState();
+        _stateMachine = new ExampleStateMachine(new ExampleState[]{ state });
+        await _stateMachine.EnterAsync<ISomeState>();
         _isInit = true;
     }
 
@@ -90,7 +88,7 @@ public class StateMachineBootstrap : MonoBehaviour
 ```
 
 ```csharp
-public class ExampleState : IExampleState, IExitableState
+public class ExampleState : State, IExampleState, IExitableState
 {
     public async Task EnterAsync(CancellationToken token)
     {
@@ -125,27 +123,11 @@ public class Example : IDisposable
         _stateMachine.OnStateChanged -= StateChangedCallback;
     }
 
-    private void StateChangedCallback(IExampleState previous, IExampleState current)
+    private void StateChangedCallback(ExampleState previous, ExampleState current)
     {
         // some code
     }
 }
-```
-
-The system supports states in which any value can be set, for this you need to use the following interface
-```csharp
-namespace MbsCore.StateMachine.Infrastructure
-{
-    public interface ISetupableState<in T>
-    {
-        void Setup(T value);
-    }
-}
-```
-
-After that, you can call a method from IStateMachine<TState> that accepts a generic argument
-```csharp
-Task EnterAsync<TEnterState, T>(T value) where TEnterState : TState;
 ```
 
 ## License
