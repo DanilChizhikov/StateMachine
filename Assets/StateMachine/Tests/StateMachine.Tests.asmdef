@@ -5,10 +5,11 @@
         "GUID:27619889b8ba8c24980f49ee34dbb44a",
         "GUID:0acc523941302664db1f4e527237feb3",
         "GUID:df9fcc7995f6441e181d058114299f42",
-        "GUID:5b23d91cfe8af42da80946aa1bfb6335",
-        "GUID:c74f853337b242f483690f9eda8376be"
+        "GUID:5b23d91cfe8af42da80946aa1bfb6335"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
@@ -17,7 +18,8 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
+        "UNITY_INCLUDE_TESTS",
+        "MBSCORE_INCLUDE_TESTS"
     ],
     "versionDefines": [],
     "noEngineReferences": false

@@ -1,11 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using MbsCore.StateMachine.Example;
-using MbsCore.StateMachine.Infrastructure;
 using NUnit.Framework;
-using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace MbsCore.StateMachine.Tests
@@ -13,67 +7,39 @@ namespace MbsCore.StateMachine.Tests
     [TestFixture]
     internal sealed class StateMachineTest
     {
-        private const int SecondsForEnterToState = 5;
         private const string StateValue = "Example";
 
-        private IExampleStateMachine _stateMachine;
+        private ExampleStateMachine _stateMachine;
         
         [SetUp]
         public void Setup()
         {
-            _stateMachine = new ExampleStateMachine(new SimpleExampleState(), new SetupableExampleState());
+            _stateMachine = new ExampleStateMachine(new ExampleState[]
+            {
+                new SimpleState(),
+                new ExitableState()
+            });
+        }
+        
+        [UnityTest]
+        public IEnumerator When_Enter_Simple_State_Then_Current_State_Equals_Simple_State()
+        {
+            yield return _stateMachine.EnterAsync<SimpleState>().ToCoroutine();
+            
+            Assert.AreEqual(typeof(SimpleState), _stateMachine.CurrentState.GetType());
         }
 
         [UnityTest]
-        public IEnumerator SimpleEnterToState()
+        public IEnumerator When_Enter_Simple_State_And_CurrentState_Is_Exitable_Then_Current_State_Equals_Simple_State_And_Exitable_State_Was_Exited()
         {
-            TaskAwaiter awaiter = _stateMachine.EnterAsync<SimpleExampleState>().GetAwaiter();
-            DateTime beginTime = DateTime.UtcNow;
-            TimeSpan timeout = beginTime.AddSeconds(SecondsForEnterToState) - beginTime;
+            yield return _stateMachine.EnterAsync<ExitableState>().ToCoroutine();
+
+            ExitableState state = _stateMachine.CurrentState as ExitableState;
             
-            yield return new WaitUntil(() => EnterStatePredicate(awaiter, beginTime, timeout));
-
-            if (IsTimeout(beginTime, timeout))
-            {
-                Assert.False(false, "Enter to state timeouted!");
-            }
-            else
-            {
-                bool isDesiredState = typeof(SimpleExampleState).Equals(_stateMachine.CurrentState.GetType());
-                Assert.AreEqual(isDesiredState, true);
-            }
-        }
-
-        [UnityTest]
-        public IEnumerator EnterToStateWithValue()
-        {
-            TaskAwaiter awaiter = _stateMachine.EnterAsync<SetupableExampleState, string>(StateValue).GetAwaiter();
-            DateTime beginTime = DateTime.UtcNow;
-            TimeSpan timeout = beginTime.AddSeconds(SecondsForEnterToState) - beginTime;
+            yield return _stateMachine.EnterAsync<SimpleState>().ToCoroutine();
             
-            yield return new WaitUntil(() => EnterStatePredicate(awaiter, beginTime, timeout));
-            
-            if (IsTimeout(beginTime, timeout))
-            {
-                Assert.False(false, "Enter to state timeouted!");
-            }
-            else
-            {
-                bool isDesiredValue = _stateMachine.CurrentState is SetupableExampleState state &&
-                                      state.Value.Equals(StateValue);
-                
-                Assert.AreEqual(isDesiredValue, true);
-            }
-        }
-
-        private bool EnterStatePredicate(TaskAwaiter awaiter, DateTime beginTime, TimeSpan timeout)
-        {
-            return awaiter.IsCompleted || IsTimeout(beginTime, timeout);
-        }
-
-        private bool IsTimeout(DateTime beginTime, TimeSpan timeout)
-        {
-            return (DateTime.UtcNow - beginTime).TotalSeconds >= timeout.TotalSeconds;
+            Assert.AreEqual(typeof(SimpleState), _stateMachine.CurrentState.GetType());
+            Assert.IsFalse(state.IsEntered);
         }
     }
 }
